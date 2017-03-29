@@ -49,6 +49,25 @@ var Job = React.createClass({
     }
   },
 
+  forceRemoveJob : function () {
+    var _this = this;
+    if (confirm('Are you sure you want to force remove job ' + this.props.job.id + '? This action is not reversible.')) {
+      $.post('job/force_remove/', {
+        queue: this.props.queue,
+        id: this.props.job.id
+      }, function (response) {
+        if (response.status === 'OK') {
+          if (_this.props.onJobUpdate) {
+            _this.props.onJobUpdate();
+          }
+        } else {
+          console.log(response);
+          alert(response.message);
+        }
+      });
+    }
+  },
+
   rerunJob: function () {
     var _this = this;
     if (confirm('Are you sure you want to rerun job ' + this.props.job.id + '? This will create another instance of the job with the same params and will be executed immediately.')) {
@@ -136,6 +155,13 @@ var Job = React.createClass({
             this.props.readonly ? '' : (
               <div>
                 <a className="job-remove" href="javascript:;" onClick={this.removeJob}>Remove Job</a>
+              </div>
+            )
+          }
+          {
+            this.props.readonly ? '' : (
+              <div>
+                <a className="job-remove" href="javascript:;" onClick={this.forceRemoveJob}>Force Remove Job</a>
               </div>
             )
           }
